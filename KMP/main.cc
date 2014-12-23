@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <cstdio>
 
 using namespace std;
 
@@ -76,6 +77,9 @@ public:
 
 int main(int argc, char** argv)
 {
+	#ifdef DEBUG
+	//freopen("input","r",stdin);
+	#endif
 	Solution sl;
 	string target;		
 	string mode;		
