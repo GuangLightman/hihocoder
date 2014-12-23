@@ -1,24 +1,26 @@
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <vector>
-#include <cstdio>
+#include <stdio.h>
+#include <malloc.h>
 
-using namespace std;
-
-struct STNode{
+typedef struct STNode{
 	int start;
 	int end;
 	int val;
-	STNode *left;
-	STNode *right;
-	STNode(int start = 0, int end = 0, int val = 0):start(start), end(end), val(val), left(NULL), right(NULL){}
-};
+	struct STNode *left;
+	struct STNode *right;
+}STNode;
 
-STNode* init(int start, int end, vector<int> &weight){
+int min(int a, int b){
+	return a < b? a : b;
+}
+
+STNode* init(int start, int end, int* weight){
 	if(start > end)	return NULL;
-	if(start == end) return (new STNode(start, end, weight[start]));
-	STNode *node = new STNode(start, end);
+	STNode *node =  (STNode*)malloc(1*sizeof(STNode));
+	node->start = start;
+	node->end = end;
+	node->left = node->right = NULL;
+	node->val = weight[start];
+	if(start == end) return node;
 	int mid = (start + end) / 2;
 	node->left = init(start, mid, weight);
 	node->right = init(mid+1, end, weight);
@@ -57,28 +59,30 @@ int main(int argc, char** argv)
 	freopen("input","r",stdin);
 	#endif
 	int n;
-	cin>>n;
-	vector<int> weight(n, 0);
-	for(int i = 0; i < n; i++)
-		cin>>weight[i];
-	STNode *root;
-	root = init(0, n - 1, weight);
+	int *weight;
+	int i = 0;
 	int times;
-	cin>>times;
-	for(int i = 0; i < times; i++){
+	STNode *root;
+	scanf("%d",&n);
+	weight = (int*)malloc(n*sizeof(int));
+	for(i = 0; i < n; i++)
+		scanf("%d",&weight[i]);
+	root = init(0, n - 1, weight);
+	scanf("%d",&times);
+	for(i = 0; i < times; i++){
 		int type;
-		cin>>type;
+		scanf("%d",&type);
 		if(type){
 			int pos, w;
-			cin>>pos>>w;
+			scanf("%d%d", &pos, &w);
 			modify(pos - 1, w, root);
 		}else{
 			int l, r;
-			cin>>l>>r;
-			cout<<query(l - 1, r - 1, root)<<endl;
+			scanf("%d%d",&l,&r);
+			printf("%d\n", query(l - 1, r - 1, root));
 		}
 	}
-
+	free(weight);
 	return 0;
 
 }
