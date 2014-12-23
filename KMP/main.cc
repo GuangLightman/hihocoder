@@ -50,7 +50,7 @@ public:
 
 		// search the mode str by the next array.
 		int count = 0;
-		for(int pos = 0; pos < lt - lm + 1; pos++){
+		for(int pos = 0; pos < lt - lm + 1;){
 			int i, j;
 			for(j = 0, i = pos; j < lm; i++, j++){
 				if(mode[j] != target[i]){
@@ -63,7 +63,10 @@ public:
 				}	
 			}
 			if(j == lm){
+				pos = pos + lm - part[j-1];
 				count++;
+			}else{
+				pos++;
 			}
 		}
 		return count;
