@@ -22,7 +22,10 @@ private:
 		int size = root.size();
 		if(cur < root[0] || cur > root[size - 1])	return false;
 		for(int i = 1; i < root.size(); i++){
-			if(cur < root[i])	return i - 1;
+			if(cur < root[i]){
+				index = i - 1;
+				return true;
+			}
 		}
 	}
 
@@ -37,15 +40,26 @@ public:
 		int index = 0;
 		for(int i = 0; i < m - 1; i++){
 			int count = 1;
-			bool is_sub;
+			bool is_sub, is_father;
 			int last_index;
 			int num = mark[trace[i]].size();
 			vector<bool> lr(num, false);
 
+			is_sub = isSub( mark[trace[i]], mark[trace[i+1]], index);
+			is_father = isSub( mark[trace[i+1]], mark[trace[i]], index);
+			if(is_father)	return false;
+			if(is_sub){
+				lr[index] = true;
+				last_index = index;
+				in = true;
+			}else{
+				in = false;
+			}
 
-
-			for(int j = i + 1; j < m; j++){
+			for(int j = i + 2; j < m; j++){
 				is_sub = isSub( mark[trace[i]], mark[trace[j]], index);
+				is_father = isSub( mark[trace[j]], mark[trace[i]], index);
+				if(is_father)	return false;
 				if(is_sub){
 					if(lr[index] && last_index != index){
 						return false;
