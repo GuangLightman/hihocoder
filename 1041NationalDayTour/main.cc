@@ -7,74 +7,36 @@ using namespace std;
 
 class Solution {
 private:
-	void genMark(vector<vector<int> > &map, vector<vector<int> > &mark, int id, int &count){
-		mark[id].push_back(count++);
-		for(int i = 0; i < map[id].size(); i++){
-			if(mark[map[id][i]].size() == 0){
-				genMark(map, mark, map[id][i], count);
-				mark[id].push_back(count++);
+	bool dfs(vector<vector<int> > &map, vector<int> &mark, vector<bool> &sign, int start, int end, bool &ok){
+		if(mark[start] <= -1){
+			ok = false;
+			return false;
+		}
+		sign[start] = true;
+		mark[start]--;
+		if(start == end)	return true;
+		for(int i = 0; i < map[start].size(); i++){
+			if(!sign[map[start][i]] && mark[map[start][i]] > 0){
+				if(dfs(map, mark, sign, map[start][i], end, ok)){
+					return true;
+				}
 			}
 		}
+		mark[start]++;
+		return false;
 	}
-
-	bool isSub(vector<int> &root, vector<int> &node, int &index){
-		int cur = node[0];
-		int size = root.size();
-		if(cur < root[0] || cur > root[size - 1])	return false;
-		for(int i = 1; i < root.size(); i++){
-			if(cur < root[i]){
-				index = i - 1;
-				return true;
-			}
-		}
-	}
-
 public:
 	bool isExistPath(vector<vector<int> > &map, vector<int> &trace){
 		int n = map.size();
-		vector<vector<int> > mark(n, vector<int>());
-		int c = 0;
-		genMark(map, mark, 0, c);
+		vector<int> mark(n, 2);
 		int m = trace.size();
-		bool in = true;
-		int index = 0;
+		vector<bool> sign(n, false);
+		bool ok = true;
+		dfs(map, mark, sign,  0, trace[0], ok);
 		for(int i = 0; i < m - 1; i++){
-			int count = 1;
-			bool is_sub, is_father;
-			int last_index;
-			int num = mark[trace[i]].size();
-			vector<bool> lr(num, false);
-
-			is_sub = isSub( mark[trace[i]], mark[trace[i+1]], index);
-			is_father = isSub( mark[trace[i+1]], mark[trace[i]], index);
-			if(is_father)	return false;
-			if(is_sub){
-				lr[index] = true;
-				last_index = index;
-				in = true;
-			}else{
-				in = false;
-			}
-
-			for(int j = i + 2; j < m; j++){
-				is_sub = isSub( mark[trace[i]], mark[trace[j]], index);
-				is_father = isSub( mark[trace[j]], mark[trace[i]], index);
-				if(is_father)	return false;
-				if(is_sub){
-					if(lr[index] && last_index != index){
-						return false;
-					}else{
-						lr[index] = true;
-						last_index = index;
-					}
-				}
-				if(is_sub != in){
-					count++;
-					in = is_sub;
-				}
-				if(count == 3)
-					return false;
-			}
+			if(mark[trace[i+1]] != 2 || !ok)	return false;
+			vector<bool> sign(n, false);
+			if(!dfs(map, mark, sign, trace[i], trace[i+1], ok))	return false;
 		}
 		return true;
 	}
