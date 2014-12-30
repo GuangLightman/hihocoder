@@ -57,9 +57,14 @@ int main(int argc, char** argv)
 	int n;
 	cin>>n;
 	string f, s;
+	char t1[100], t2[100];
 	int count = 0;
 	for(int i = 0; i < n; i++){
-		cin>>f>>s;
+		t1[0] = t2[1] = '\0';
+		scanf("%s %s", t1, t2);
+		f = t1;
+		s = t2;
+		//cin>>f>>s;
 		if(family.count(f) == 0){
 			TNode tmp(f, -1);
 			tree.push_back(tmp);
@@ -80,7 +85,11 @@ int main(int argc, char** argv)
 	vector<int> qtmp(3, -1);
 	vector<int> ttmp(2, 0);
 	for(int i = 0; i < m; i++){
-		cin>>n1>>n2;
+		t1[0] = t2[1] = '\0';
+		scanf("%s %s", t1, t2);
+		n1 = t1;
+		n2 = t2;
+		//cin>>n1>>n2;
 		if(n1 == n2){
 			if(family.count(n1) != 0){
 				qtmp[0] = family[n1];
@@ -99,26 +108,33 @@ int main(int argc, char** argv)
 			c++;
 			continue;
 		}
-		qtmp[0] = family[n1];
-		qtmp[1] = family[n2];
-		querys.push_back(qtmp);
-		if(family.count(n1) == 0 || family.count(n2) == 0)
+		if(family.count(n1) == 0 || family.count(n2) == 0){
+			querys.push_back(qtmp);
 			continue;
+		}
+		int fn1 = family[n1];
+		int fn2 = family[n2];
+		qtmp[0] = fn1;
+		qtmp[1] = fn2;
+		querys.push_back(qtmp);
 		ttmp[0] = c;
-		ttmp[1] = family[n2];
-		tree[family[n1]].querys.push_back(ttmp);
-		ttmp[1] = family[n1];
-		tree[family[n2]].querys.push_back(ttmp);
+		ttmp[1] = fn2;
+		tree[fn1].querys.push_back(ttmp);
+		ttmp[1] = fn1;
+		tree[fn2].querys.push_back(ttmp);
 		c++;
 	}
 
 	MakeQuery();
 
 	for(int i = 0; i < c; i++){
-		if(querys[i][2] == -1)
-			cout<<"-1"<<endl;
-		else
-			cout<<tree[querys[i][2]].str<<endl;
+		if(querys[i][2] == -1){
+			printf("-1\n");
+		}
+		else{
+			printf("%s\n", tree[querys[i][2]].str.c_str());
+			//cout<<tree[querys[i][2]].str<<endl;
+		}
 	}
 
 	/*
