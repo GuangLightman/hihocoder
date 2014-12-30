@@ -11,62 +11,25 @@ map<string, int> family;
 struct TNode{
 	string str;
 	int parent;
-	int mark;
+	int color;
 	vector<int> sons;
 	vector<vector<int> > querys;
-	TNode(string s = "", int p = -1):str(s),parent(p),mark(-1){}
+	TNode(string s = "", int p = -1):str(s),parent(p),color(0){}
 };
 
 vector<TNode> tree;
 vector<vector<int> > querys;
-
-int getHeight(int pos){
-	int height = 0;
-	while(pos != 0){
-		pos = tree[pos].parent;
-		height++;
-	}
-	return height;
-}
-
-int getComm(string &n1, string &n2){
-	if(family.count(n1) == 0 || family.count(n2) == 0)	return -1;
-	int pos1 = family[n1];
-	int pos2 = family[n2];
-	int h1 = getHeight(pos1);
-	int h2 = getHeight(pos2);
-	if(h1 < h2){
-		int tmp = h1;
-		h1 = h2;
-		h2 = tmp;
-		tmp = pos1;
-		pos1 = pos2;
-		pos2 = tmp;
-	}
-	int gap = h1 - h2;
-	while(gap-- > 0){
-		pos1 = tree[pos1].parent;
-	}
-	while(h2-- > 0){
-		if(pos1 == pos2)	return pos1;
-		else{
-			pos1 = tree[pos1].parent;
-			pos2 = tree[pos2].parent;
-		}
-	}
-	return -1;
-}
 
 void dfs(int pos){
 	for(int i = 0; i < tree[pos].querys.size(); i++){
 		int id = tree[pos].querys[i][0];
 		if(querys[id][2] != -1) continue;
 		int other = tree[pos].querys[i][1];
-		if(tree[other].mark != -1){
-			if(tree[other].mark == tree[other].sons.size()){
+		if(tree[other].color != 0){
+			if(tree[other].color == 2){
 				// 向上搜寻
 				while(other != 0){
-					if(tree[other].mark < tree[other].sons.size())
+					if(tree[other].color == 1)
 							break;
 					other = tree[other].parent;	
 				}
@@ -74,11 +37,11 @@ void dfs(int pos){
 			querys[id][2] = other;
 		}
 	}
-	tree[pos].mark++;
+	tree[pos].color = 1; // gray
 	for(int i = 0; i < tree[pos].sons.size(); i++){
 		dfs(tree[pos].sons[i]);
-		tree[pos].mark++;
 	}
+	tree[pos].color = 2;  // black
 }
 
 void MakeQuery(){
