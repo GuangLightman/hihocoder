@@ -1,13 +1,11 @@
 #include <iostream>
-#include <climits>
 #include <cstdio>
-#include <vector>
-#include <sys/time.h>
 #include <algorithm>
 
 using namespace std;
 
 int father[100001];
+int son[100001];
 
 struct Node{
 	int w;
@@ -17,37 +15,43 @@ struct Node{
 
 Node table[1000001];
 
-inline int root(int x){
-	return x == father[x]? x : root(father[x]);
+int root(int x){
+	if(x != father[x])
+		father[x] = root(father[x]);
+	return father[x];
 }
 
-inline bool join(int x, int y){
-	if(root(x) == root(y))	return false;
+bool join(int x, int y){
+	int rx = root(x);
+	int ry = root(y);
+	if(rx == ry)	return false;
 	else{
-		father[root(x)] = root(y);
+		if(son[rx] < son[ry]){
+			father[rx] = ry;
+			son[ry] +=son[rx];
+		}else{
+			father[ry] = rx;
+			son[rx] +=son[ry];
+		}
 		return true;
 	}
 }
 
 int getMinSpanningTree(int vecnum, int arcnum){
 	int count = 0;
-	int s, e;
 	int sum = 0;
 	for(int i = 0; i < arcnum && count < vecnum; i++){
-		s = table[i].s;
-		e = table[i].e;
-		if(join(s, e))
+		if(join(table[i].s, table[i].e)){
 			sum = sum + table[i].w;
+			count++;
+		}
 	}
 	return sum;
 }
 
-class Cmp{
-public:
-	bool operator()(Node a, Node b){
-		return a.w < b.w;
-	}
-};
+bool Cmp(const Node& a, const Node& b){
+	return a.w < b.w;
+}
 
 int main(int argc, char** argv)
 {
@@ -55,33 +59,24 @@ int main(int argc, char** argv)
 	freopen("input", "r", stdin);
 	#endif
 	int vecnum, arcnum;
-	cin>>vecnum>>arcnum;
+	//cin>>vecnum>>arcnum;
+	scanf("%d%d", &vecnum, &arcnum);
 	if(vecnum <= 0 || arcnum <= 0 || vecnum > arcnum + 1)	return 0;
 	for(int i = 0; i < vecnum; i++){
 		father[i] = i;
+		son[i] = 0;
 	}
-	int s, e, w;
-	int count = 0;
-	for(int i = 0; i < arcnum; i++, count++){
+	int s, e, w, i = 0;
+	for(i = 0; i < arcnum; i++){
 		//cin>>s>>e>>w;
-		scanf("%d%d%d", &s, &e, &w);
+		scanf("%d%d%d", &s, &e, &(table[i].w));
 		s--;
 		e--;
-		table[count].w = w; 
-		table[count].s = s; 
-		table[count].e = e; 
+		table[i].s = s; 
+		table[i].e = e; 
 	}
-	sort(table, table + count, Cmp());
-	#ifdef DEBUG
-	struct timeval start, end;
-	gettimeofday(&start, NULL );
-	#endif
+	sort(table, table + i, Cmp);
 	int ret = getMinSpanningTree(vecnum, arcnum);
 	cout<<ret<<endl;
-	#ifdef DEBUG
-	gettimeofday( &end, NULL );
-	double timeuse = 1000000 * ( end.tv_sec - start.tv_sec ) + end.tv_usec - start.tv_usec; 
-	cout<<timeuse/1000000<<endl;
-	#endif
 	return 0;
 }
