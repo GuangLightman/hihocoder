@@ -56,6 +56,7 @@ int main(int argc, char** argv)
 	#endif
 	int n;
 	cin>>n;
+	tree.reserve(n + 10);
 	string f, s;
 	char t1[100], t2[100];
 	int count = 0;
@@ -80,6 +81,7 @@ int main(int argc, char** argv)
 	}
 	int m;
 	cin>>m;
+	querys.reserve(m + 10);
 	string n1, n2;
 	int c = 0;
 	vector<int> qtmp(3, -1);
